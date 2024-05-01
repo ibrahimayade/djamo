@@ -4,10 +4,28 @@ services:
     build: ./thirdpartymock
     ports:
       - "3000:3000"
+  YOUR_API: 
+   build: ./your_api
+   environment:
+      THIRD_PARTY: "http://thirdparty:3000" 
+      CLIENT: "http://client:3200" 
+   expose:
+     - 8080:8080
+  artemis:
+    image: vromero/activemq-artemis:2.18.0-alpine
+    ports:
+      - "61616:61616"
+      - "8161:8161"
+    volumes:
+      - ./artemis.xml:/var/lib/artemis/etc/activemq.xml
+    depends_on: 
+      - artemis
+      - thirdparty
+
 
   client:
     build: ./client
     environment:
-      YOUR_API: "http://thirdparty:3000" # replace with your new API
+      YOUR_API: "http://YOUR_API:8080" # replace with your new API
     ports:
       - "3100:3100"
